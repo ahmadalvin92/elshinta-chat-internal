@@ -9,7 +9,11 @@ from django import models
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('-created_at')
@@ -34,7 +38,11 @@ class MessageViewSet(viewsets.ModelViewSet):
         receiver = self.request.query_params.get('receiver')
         user = self.request.user
         if room:
-            return qs.filter(room__id=room).order_by('created_at')
+            if room.isdigit():
+                qs = qs.filter(room__id=room)
+            else:
+                qs = qs.filter(room__name=room)
+            return qs.order_by('created_at')
         if receiver:
             return qs.filter(
                 (models.Q(sender=user) & models.Q(receiver__id=receiver)) | (models.Q(sender__id=receiver) & models.Q(receiver=user))
@@ -45,4 +53,8 @@ class MessageViewSet(viewsets.ModelViewSet):
 class AnnouncementViewSet(viewsets.ModelViewSet):
     queryset = Announcement.objects.all().order_by('-created_at')
     serializer_class = AnnouncementSerializer
-    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]

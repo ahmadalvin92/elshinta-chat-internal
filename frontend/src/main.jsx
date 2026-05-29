@@ -6,6 +6,7 @@ import Header from './components/Header'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ChatRoom from './pages/ChatRoom'
+import AdminDashboard from './pages/AdminDashboard'
 
 function Root(){
   return (
@@ -17,6 +18,7 @@ function Root(){
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/chat/:roomName" element={<ChatRoom />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </div>
     </BrowserRouter>
